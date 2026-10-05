@@ -4,10 +4,12 @@ import type { Transaction } from "../types";
 
 type TransactionsTableProps = {
   transactions: Transaction[];
+  onEditTransaction?: (transaction: Transaction) => void;
 };
 
 export function TransactionsTable({
   transactions,
+  onEditTransaction,
 }: TransactionsTableProps) {
   return (
     <div className="hidden overflow-hidden rounded-lg border border-border bg-surface md:block">
@@ -46,8 +48,27 @@ export function TransactionsTable({
                 {formatCurrency(transaction.amount)}
               </td>
 
-              <td className="px-4 py-3 text-right text-foreground-secondary">
-                —
+              <td className="px-4 py-3 text-right">
+                {onEditTransaction ? (
+                  <button
+                    type="button"
+                    onClick={() => onEditTransaction(transaction)}
+                    className="
+                      rounded-md px-2 py-1
+                      font-medium text-foreground-secondary
+                      transition-colors
+                      hover:bg-surface-subtle
+                      hover:text-foreground
+                      focus-visible:outline-none
+                      focus-visible:ring-2
+                      focus-visible:ring-focus-ring
+                    "
+                  >
+                    Edit
+                  </button>
+                ) : (
+                  <span className="text-foreground-secondary">—</span>
+                )}
               </td>
             </tr>
           ))}

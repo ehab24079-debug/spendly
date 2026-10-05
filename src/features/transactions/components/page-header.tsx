@@ -1,6 +1,12 @@
 import { Button } from "@/components/ui/button";
 
-export function PageHeader() {
+type PageHeaderProps = {
+  onAddTransaction: () => void;
+};
+
+export function PageHeader({
+  onAddTransaction,
+}: PageHeaderProps) {
   return (
     <div className="flex items-center justify-between gap-4">
       <div>
@@ -13,7 +19,12 @@ export function PageHeader() {
         </p>
       </div>
 
-      <Button type="button">Add Transaction</Button>
+      <Button
+        type="button"
+        onClick={onAddTransaction}
+      >
+        Add Transaction
+      </Button>
     </div>
   );
 }

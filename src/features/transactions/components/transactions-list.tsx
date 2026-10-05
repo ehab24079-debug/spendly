@@ -4,10 +4,12 @@ import type { Transaction } from "../types";
 
 type TransactionsListProps = {
   transactions: Transaction[];
+  onEditTransaction?: (transaction: Transaction) => void;
 };
 
 export function TransactionsList({
   transactions,
+  onEditTransaction,
 }: TransactionsListProps) {
   return (
     <div className="space-y-3 md:hidden">
@@ -39,7 +41,29 @@ export function TransactionsList({
           </div>
 
           <div className="mt-3 flex items-center justify-between gap-3 text-sm text-foreground-secondary">
-            <span className="capitalize">{transaction.type}</span>
+            <div className="flex items-center gap-3">
+              <span className="capitalize">{transaction.type}</span>
+
+              {onEditTransaction ? (
+                <button
+                  type="button"
+                  onClick={() => onEditTransaction(transaction)}
+                  className="
+                    rounded-md px-2 py-1
+                    font-medium text-foreground-secondary
+                    transition-colors
+                    hover:bg-surface-subtle
+                    hover:text-foreground
+                    focus-visible:outline-none
+                    focus-visible:ring-2
+                    focus-visible:ring-focus-ring
+                  "
+                >
+                  Edit
+                </button>
+              ) : null}
+            </div>
+
             <time dateTime={transaction.date}>
               {formatDate(transaction.date)}
             </time>
