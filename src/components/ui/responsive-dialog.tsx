@@ -51,7 +51,10 @@ export function ResponsiveDialog({
       ref={dialogRef}
       aria-labelledby={titleId}
       onClick={handleBackdropClick}
-      onCancel={() => onOpenChange(false)}
+      onCancel={(event) => {
+        event.preventDefault();
+        onOpenChange(false);
+      }}
       onClose={() => {
         if (open) {
           onOpenChange(false);

@@ -5,11 +5,13 @@ import type { Transaction } from "../types";
 type TransactionsListProps = {
   transactions: Transaction[];
   onEditTransaction?: (transaction: Transaction) => void;
+  onDeleteTransaction?: (transaction: Transaction) => void;
 };
 
 export function TransactionsList({
   transactions,
   onEditTransaction,
+  onDeleteTransaction,
 }: TransactionsListProps) {
   return (
     <div className="space-y-3 md:hidden">
@@ -60,6 +62,24 @@ export function TransactionsList({
                   "
                 >
                   Edit
+                </button>
+              ) : null}
+
+              {onDeleteTransaction ? (
+                <button
+                  type="button"
+                  onClick={() => onDeleteTransaction(transaction)}
+                  className="
+                    rounded-md px-2 py-1
+                    font-medium text-danger
+                    transition-colors
+                    hover:bg-surface-subtle
+                    focus-visible:outline-none
+                    focus-visible:ring-2
+                    focus-visible:ring-focus-ring
+                  "
+                >
+                  Delete
                 </button>
               ) : null}
             </div>

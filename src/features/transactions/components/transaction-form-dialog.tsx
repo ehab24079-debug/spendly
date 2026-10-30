@@ -12,6 +12,9 @@ type TransactionFormDialogProps = {
   title: string;
   defaultValues?: Partial<TransactionFormValues>;
   submitLabel: string;
+  pendingSubmitLabel?: string;
+  submitError?: string;
+  isPending: boolean;
   onSubmit: (
     values: TransactionFormValues,
   ) => void | Promise<void>;
@@ -23,17 +26,31 @@ export function TransactionFormDialog({
   title,
   defaultValues,
   submitLabel,
+  pendingSubmitLabel,
+  submitError,
+  isPending,
   onSubmit,
 }: TransactionFormDialogProps) {
+  function handleOpenChange(nextOpen: boolean) {
+    if (isPending && !nextOpen) {
+      return;
+    }
+
+    onOpenChange(nextOpen);
+  }
+
   return (
     <ResponsiveDialog
       open={open}
-      onOpenChange={onOpenChange}
+      onOpenChange={handleOpenChange}
       title={title}
     >
       <TransactionForm
         defaultValues={defaultValues}
         submitLabel={submitLabel}
+        pendingSubmitLabel={pendingSubmitLabel}
+        submitError={submitError}
+        isPending={isPending}
         onSubmit={onSubmit}
       />
     </ResponsiveDialog>

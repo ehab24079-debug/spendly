@@ -7,15 +7,18 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 
-import { categoriesFixture } from "../categories.fixture";
 import {
-  transactionFormSchema,
+  createTransactionFormSchema,
   type TransactionFormValues,
 } from "../transaction-form.schema";
+import { useCategoriesQuery } from "../transactions.queries";
 
 type TransactionFormProps = {
   defaultValues?: Partial<TransactionFormValues>;
   submitLabel: string;
+  pendingSubmitLabel?: string;
+  submitError?: string;
+  isPending?: boolean;
   onSubmit: (
     values: TransactionFormValues,
   ) => void | Promise<void>;
@@ -24,8 +27,17 @@ type TransactionFormProps = {
 export function TransactionForm({
   defaultValues,
   submitLabel,
+  pendingSubmitLabel = submitLabel,
+  submitError,
+  isPending = false,
   onSubmit,
 }: TransactionFormProps) {
+  const {
+    data: categories = [],
+    isLoading: isCategoriesLoading,
+    isError: isCategoriesError,
+  } = useCategoriesQuery();
+
   const {
     register,
     handleSubmit,
@@ -34,7 +46,9 @@ export function TransactionForm({
     setValue,
     formState: { errors, isSubmitting },
   } = useForm<TransactionFormValues>({
-    resolver: zodResolver(transactionFormSchema),
+    resolver: zodResolver(
+      createTransactionFormSchema(categories),
+    ),
     defaultValues: {
       categoryId: "",
       date: "",
@@ -48,8 +62,16 @@ export function TransactionForm({
     name: "type",
   });
 
+  const hasCategories = categories.length > 0;
+
+  const isCategoriesUnavailable =
+    isCategoriesError && !hasCategories;
+
+  const isCategoriesInitialLoading =
+    isCategoriesLoading && !hasCategories;
+
   const availableCategories = selectedType
-    ? categoriesFixture.filter(
+    ? categories.filter(
         (category) => category.type === selectedType,
       )
     : [];
@@ -64,7 +86,7 @@ export function TransactionForm({
     const nextType = event.target.value;
     const selectedCategoryId = getValues("categoryId");
 
-    const selectedCategory = categoriesFixture.find(
+    const selectedCategory = categories.find(
       (category) => category.id === selectedCategoryId,
     );
 
@@ -79,6 +101,8 @@ export function TransactionForm({
     }
   }
 
+  const isSubmitPending = isSubmitting || isPending;
+
   return (
     <form
       className="space-y-4"
@@ -86,7 +110,10 @@ export function TransactionForm({
       noValidate
     >
       <div className="space-y-1.5">
-        <label htmlFor="transaction-type" className="text-sm font-medium">
+        <label
+          htmlFor="transaction-type"
+          className="text-sm font-medium"
+        >
           Type
         </label>
 
@@ -108,7 +135,10 @@ export function TransactionForm({
       </div>
 
       <div className="space-y-1.5">
-        <label htmlFor="transaction-amount" className="text-sm font-medium">
+        <label
+          htmlFor="transaction-amount"
+          className="text-sm font-medium"
+        >
           Amount
         </label>
 
@@ -138,13 +168,26 @@ export function TransactionForm({
 
         <Select
           id="transaction-category"
-          disabled={!selectedType}
+          disabled={
+            !selectedType ||
+            isCategoriesInitialLoading ||
+            isCategoriesUnavailable
+          }
           {...register("categoryId")}
         >
-          <option value="">Select category</option>
+          <option value="">
+            {isCategoriesInitialLoading
+              ? "Loading categories..."
+              : isCategoriesUnavailable
+                ? "Failed to load categories"
+                : "Select category"}
+          </option>
 
           {availableCategories.map((category) => (
-            <option key={category.id} value={category.id}>
+            <option
+              key={category.id}
+              value={category.id}
+            >
               {category.name}
             </option>
           ))}
@@ -158,7 +201,10 @@ export function TransactionForm({
       </div>
 
       <div className="space-y-1.5">
-        <label htmlFor="transaction-date" className="text-sm font-medium">
+        <label
+          htmlFor="transaction-date"
+          className="text-sm font-medium"
+        >
           Date
         </label>
 
@@ -197,8 +243,23 @@ export function TransactionForm({
         ) : null}
       </div>
 
-      <Button type="submit" disabled={isSubmitting}>
-        {submitLabel}
+      {submitError ? (
+        <p className="text-sm text-danger" role="alert">
+          {submitError}
+        </p>
+      ) : null}
+
+      <Button
+        type="submit"
+        disabled={
+          isSubmitPending ||
+          isCategoriesInitialLoading ||
+          isCategoriesUnavailable
+        }
+      >
+        {isSubmitPending
+          ? pendingSubmitLabel
+          : submitLabel}
       </Button>
     </form>
   );
