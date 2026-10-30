@@ -24,8 +24,18 @@ type StrapiTransaction = {
   category: StrapiCategory;
 };
 
+type StrapiPagination = {
+  page: number;
+  pageSize: number;
+  pageCount: number;
+  total: number;
+};
+
 type StrapiCollectionResponse<T> = {
   data: T[];
+  meta: {
+    pagination: StrapiPagination;
+  };
 };
 
 export type TransactionInput = {
@@ -82,9 +92,10 @@ function getMonthRange(month: string) {
   };
 }
 
-export async function getTransactionsByMonth(
+async function getTransactionsPage(
   month: string,
-): Promise<Transaction[]> {
+  page: number,
+): Promise<StrapiCollectionResponse<StrapiTransaction>> {
   const { start, nextMonthStart } = getMonthRange(month);
 
   const params = new URLSearchParams();
@@ -92,6 +103,7 @@ export async function getTransactionsByMonth(
   params.set("filters[date][$gte]", start);
   params.set("filters[date][$lt]", nextMonthStart);
   params.set("populate", "category");
+  params.set("pagination[page]", String(page));
 
   const response = await fetch(
     `${STRAPI_URL}/api/transactions?${params.toString()}`,
@@ -101,10 +113,29 @@ export async function getTransactionsByMonth(
     throw new Error("Failed to fetch transactions.");
   }
 
-  const result =
-    (await response.json()) as StrapiCollectionResponse<StrapiTransaction>;
+  return response.json() as Promise<
+    StrapiCollectionResponse<StrapiTransaction>
+  >;
+}
 
-  return result.data.map(mapTransaction);
+export async function getTransactionsByMonth(
+  month: string,
+): Promise<Transaction[]> {
+  const firstPage = await getTransactionsPage(month, 1);
+
+  const transactions = [...firstPage.data];
+
+  for (
+    let page = 2;
+    page <= firstPage.meta.pagination.pageCount;
+    page += 1
+  ) {
+    const nextPage = await getTransactionsPage(month, page);
+
+    transactions.push(...nextPage.data);
+  }
+
+  return transactions.map(mapTransaction);
 }
 
 export async function getCategories(): Promise<Category[]> {

@@ -7,13 +7,70 @@ import { Select } from "@/components/ui/select";
 
 import { useCategoriesQuery } from "../transactions.queries";
 
-function getCurrentMonth() {
-  const now = new Date();
-
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, "0");
+function getMonthValue(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
 
   return `${year}-${month}`;
+}
+
+function getCurrentMonth() {
+  return getMonthValue(new Date());
+}
+
+function formatMonth(month: string) {
+  const match = /^(\d{4})-(\d{2})$/.exec(month);
+
+  if (!match) {
+    return month;
+  }
+
+  const year = Number(match[1]);
+  const monthNumber = Number(match[2]);
+
+  if (monthNumber < 1 || monthNumber > 12) {
+    return month;
+  }
+
+  return new Intl.DateTimeFormat("en", {
+    month: "long",
+    year: "numeric",
+  }).format(new Date(year, monthNumber - 1, 1));
+}
+
+function getMonthOptions(selectedMonth: string, count = 3) {
+  const now = new Date();
+
+  const options = Array.from({ length: count }, (_, index) => {
+    const date = new Date(
+      now.getFullYear(),
+      now.getMonth() - index,
+      1,
+    );
+
+    const value = getMonthValue(date);
+
+    return {
+      value,
+      label: formatMonth(value),
+    };
+  });
+
+  const hasSelectedMonth = options.some(
+    (month) => month.value === selectedMonth,
+  );
+
+  if (
+    !hasSelectedMonth &&
+    /^\d{4}-(0[1-9]|1[0-2])$/.test(selectedMonth)
+  ) {
+    options.push({
+      value: selectedMonth,
+      label: formatMonth(selectedMonth),
+    });
+  }
+
+  return options;
 }
 
 export function TransactionControls() {
@@ -29,6 +86,8 @@ export function TransactionControls() {
 
   const currentMonth = getCurrentMonth();
   const selectedMonth = searchParams.get("month") ?? currentMonth;
+  const monthOptions = getMonthOptions(selectedMonth);
+
   const search = searchParams.get("search") ?? "";
   const selectedType = searchParams.get("type") ?? "all";
   const selectedCategory = searchParams.get("category") ?? "all";
@@ -118,9 +177,11 @@ export function TransactionControls() {
           handleMonthChange(event.target.value)
         }
       >
-        <option value="2026-10">October 2026</option>
-        <option value="2026-09">September 2026</option>
-        <option value="2026-08">August 2026</option>
+        {monthOptions.map((month) => (
+          <option key={month.value} value={month.value}>
+            {month.label}
+          </option>
+        ))}
       </Select>
 
       <Input
