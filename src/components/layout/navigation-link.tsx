@@ -7,12 +7,14 @@ type NavigationLinkProps = {
   href: string;
   label: string;
   className?: string;
+  onNavigate?: () => void;
 };
 
 export function NavigationLink({
   href,
   label,
   className = "",
+  onNavigate,
 }: NavigationLinkProps) {
   const pathname = usePathname();
 
@@ -24,6 +26,7 @@ export function NavigationLink({
   return (
     <Link
       href={href}
+      onClick={onNavigate}
       aria-current={isActive ? "page" : undefined}
       className={`
         rounded-md text-sm font-medium transition-colors

@@ -1,9 +1,13 @@
+
 "use client";
 
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
+import { StateCard } from "@/components/ui/state-card";
+import { PageHeader } from "@/components/layout/page-header";
+import { PageLayout } from "@/components/layout/page-layout";
 
 import {
   useCreateTransactionMutation,
@@ -15,7 +19,6 @@ import type { TransactionFormValues } from "../transaction-form.schema";
 import type { Transaction } from "../types";
 
 import { DeleteTransactionDialog } from "./delete-transaction-dialog";
-import { PageHeader } from "./page-header";
 import { TransactionControls } from "./transaction-controls";
 import { TransactionFormDialog } from "./transaction-form-dialog";
 import { TransactionsList } from "./transactions-list";
@@ -181,24 +184,38 @@ export function TransactionsView() {
     : undefined;
 
   return (
-    <section className="p-6">
-      <div className="space-y-6">
-        <PageHeader onAddTransaction={handleAddTransaction} />
+    <PageLayout>
+      <PageHeader
+        actions={
+          <Button
+            type="button"
+            onClick={handleAddTransaction}
+            className="w-full sm:w-auto"
+          >
+            Add Transaction
+          </Button>
+        }
+      >
+        <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">
+          Transactions
+        </h1>
 
-        <TransactionControls />
+        <p className="mt-1 text-sm text-foreground-secondary">
+          Review and manage your monthly transactions.
+        </p>
+      </PageHeader>
 
-        {isLoading ? (
-          <p className="text-sm text-foreground-secondary">
-            Loading transactions...
-          </p>
-        ) : null}
+      <TransactionControls />
 
-        {isLoadingError ? (
-          <div className="space-y-3">
-            <p className="text-sm text-danger">
-              Failed to load transactions.
-            </p>
+      {isLoading ? (
+        <p className="text-sm text-foreground-secondary">
+          Loading transactions...
+        </p>
+      ) : null}
 
+      {isLoadingError ? (
+        <StateCard
+          action={
             <Button
               type="button"
               variant="secondary"
@@ -207,100 +224,120 @@ export function TransactionsView() {
             >
               {isFetching ? "Retrying..." : "Retry"}
             </Button>
-          </div>
-        ) : null}
+          }
+        >
+          <h2 className="text-lg font-semibold">
+            Unable to load transactions
+          </h2>
 
-        {!isLoadingError && isRefetchError ? (
-          <div className="flex flex-wrap items-center gap-3">
-            <p className="text-sm text-danger">
-              Failed to refresh transactions. Showing the last loaded data.
-            </p>
-
-            <Button
-              type="button"
-              variant="secondary"
-              disabled={isFetching}
-              onClick={() => void refetch()}
-            >
-              {isFetching ? "Retrying..." : "Retry"}
-            </Button>
-          </div>
-        ) : null}
-
-        {!isLoading && !isLoadingError && isEmptyMonth ? (
-          <p className="text-sm text-foreground-secondary">
-            No transactions for this month.
+          <p className="mt-2 text-sm text-foreground-secondary">
+            Failed to load transactions. Please try again.
           </p>
-        ) : null}
+        </StateCard>
+      ) : null}
 
-        {!isLoading &&
-        !isLoadingError &&
-        hasNoMatchingTransactions ? (
-          <p className="text-sm text-foreground-secondary">
+      {!isLoadingError && isRefetchError ? (
+        <div className="flex flex-wrap items-center gap-3">
+          <p className="text-sm text-danger">
+            Failed to refresh transactions. Showing the last loaded data.
+          </p>
+
+          <Button
+            type="button"
+            variant="secondary"
+            disabled={isFetching}
+            onClick={() => void refetch()}
+          >
+            {isFetching ? "Retrying..." : "Retry"}
+          </Button>
+        </div>
+      ) : null}
+
+      {!isLoading && !isLoadingError && isEmptyMonth ? (
+        <StateCard>
+          <h2 className="text-lg font-semibold">
+            No transactions this month
+          </h2>
+
+          <p className="mt-2 text-sm text-foreground-secondary">
+            Add a transaction to start tracking your monthly activity.
+          </p>
+        </StateCard>
+      ) : null}
+
+      {!isLoading &&
+      !isLoadingError &&
+      hasNoMatchingTransactions ? (
+        <StateCard>
+          <h2 className="text-lg font-semibold">
+            No matching transactions
+          </h2>
+
+          <p className="mt-2 text-sm text-foreground-secondary">
             No transactions match your search or filters.
           </p>
-        ) : null}
+        </StateCard>
+      ) : null}
 
-        {!isLoading &&
-        !isLoadingError &&
-        !isEmptyMonth &&
-        !hasNoMatchingTransactions ? (
-          <>
-            <TransactionsTable
-              transactions={visibleTransactions}
-              onEditTransaction={handleEditTransaction}
-              onDeleteTransaction={handleDeleteTransaction}
-            />
-
-            <TransactionsList
-              transactions={visibleTransactions}
-              onEditTransaction={handleEditTransaction}
-              onDeleteTransaction={handleDeleteTransaction}
-            />
-          </>
-        ) : null}
-
-        {isTransactionFormOpen ? (
-          <TransactionFormDialog
-            key={selectedTransaction?.id ?? "add"}
-            open
-            onOpenChange={handleFormOpenChange}
-            title={
-              selectedTransaction
-                ? "Edit Transaction"
-                : "Add Transaction"
-            }
-            defaultValues={transactionFormDefaultValues}
-            submitLabel={
-              selectedTransaction
-                ? "Save Changes"
-                : "Add Transaction"
-            }
-            pendingSubmitLabel={
-              selectedTransaction
-                ? "Saving..."
-                : "Adding..."
-            }
-            submitError={transactionSubmitError}
-            isPending={isTransactionMutationPending}
-            onSubmit={handleTransactionSubmit}
+      {!isLoading &&
+      !isLoadingError &&
+      !isEmptyMonth &&
+      !hasNoMatchingTransactions ? (
+        <>
+          <TransactionsTable
+            transactions={visibleTransactions}
+            onEditTransaction={handleEditTransaction}
+            onDeleteTransaction={handleDeleteTransaction}
           />
-        ) : null}
 
-        {transactionToDelete ? (
-          <DeleteTransactionDialog
-            open
-            onOpenChange={handleDeleteDialogOpenChange}
-            onConfirm={handleDeleteConfirm}
-            isPending={deleteTransactionMutation.isPending}
-            errorMessage={
-              deleteTransactionMutation.isError
-                ? "Failed to delete transaction. Please try again."
-                : undefined
-            }
+          <TransactionsList
+            transactions={visibleTransactions}
+            onEditTransaction={handleEditTransaction}
+            onDeleteTransaction={handleDeleteTransaction}
           />
-        ) : null}
-      </div>
-    </section>
+        </>
+      ) : null}
+
+      {isTransactionFormOpen ? (
+        <TransactionFormDialog
+          key={selectedTransaction?.id ?? "add"}
+          open
+          onOpenChange={handleFormOpenChange}
+          title={
+            selectedTransaction
+              ? "Edit Transaction"
+              : "Add Transaction"
+          }
+          defaultValues={transactionFormDefaultValues}
+          submitLabel={
+            selectedTransaction
+              ? "Save Changes"
+              : "Add Transaction"
+          }
+          pendingSubmitLabel={
+            selectedTransaction
+              ? "Saving..."
+              : "Adding..."
+          }
+          submitError={transactionSubmitError}
+          isPending={isTransactionMutationPending}
+          onSubmit={handleTransactionSubmit}
+        />
+      ) : null}
+
+      {transactionToDelete ? (
+        <DeleteTransactionDialog
+          open
+          onOpenChange={handleDeleteDialogOpenChange}
+          onConfirm={handleDeleteConfirm}
+          isPending={deleteTransactionMutation.isPending}
+          errorMessage={
+            deleteTransactionMutation.isError
+              ? "Failed to delete transaction. Please try again."
+              : undefined
+          }
+        />
+      ) : null}
+    </PageLayout>
   );
 }

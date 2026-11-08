@@ -1,7 +1,5 @@
+import { DashboardView } from "@/features/dashboard/components/dashboard-view";
+
 export default function Home() {
-  return (
-    <main className="flex min-h-screen items-center justify-center">
-      <h1 className="text-2xl font-semibold">Spendly</h1>
-    </main>
-  );
+  return <DashboardView />;
 }
