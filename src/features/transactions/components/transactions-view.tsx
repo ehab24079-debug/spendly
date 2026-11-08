@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { StateCard } from "@/components/ui/state-card";
+import { ErrorState } from "@/components/feedback/error-state";
 import { PageHeader } from "@/components/layout/page-header";
 import { PageLayout } from "@/components/layout/page-layout";
 
@@ -22,6 +23,7 @@ import { DeleteTransactionDialog } from "./delete-transaction-dialog";
 import { TransactionControls } from "./transaction-controls";
 import { TransactionFormDialog } from "./transaction-form-dialog";
 import { TransactionsList } from "./transactions-list";
+import { TransactionsLoadingState } from "./transactions-loading-state";
 import { TransactionsTable } from "./transactions-table";
 
 function getCurrentMonth() {
@@ -207,33 +209,15 @@ export function TransactionsView() {
 
       <TransactionControls />
 
-      {isLoading ? (
-        <p className="text-sm text-foreground-secondary">
-          Loading transactions...
-        </p>
-      ) : null}
+      {isLoading ? <TransactionsLoadingState /> : null}
 
       {isLoadingError ? (
-        <StateCard
-          action={
-            <Button
-              type="button"
-              variant="secondary"
-              disabled={isFetching}
-              onClick={() => void refetch()}
-            >
-              {isFetching ? "Retrying..." : "Retry"}
-            </Button>
-          }
-        >
-          <h2 className="text-lg font-semibold">
-            Unable to load transactions
-          </h2>
-
-          <p className="mt-2 text-sm text-foreground-secondary">
-            Failed to load transactions. Please try again.
-          </p>
-        </StateCard>
+        <ErrorState
+          title="Unable to load transactions"
+          description="Failed to load transactions. Please try again."
+          onRetry={() => void refetch()}
+          isRetrying={isFetching}
+        />
       ) : null}
 
       {!isLoadingError && isRefetchError ? (

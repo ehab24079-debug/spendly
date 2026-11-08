@@ -5,13 +5,14 @@ import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Select } from "@/components/ui/select";
+import { ResponsiveDialog } from "@/components/ui/responsive-dialog";
 import { PageHeader } from "@/components/layout/page-header";
 import { PageLayout } from "@/components/layout/page-layout";
 
 import { budgetsFixture } from "../budgets.fixture";
 
 import { BudgetCard } from "./budget-card";
-import { BudgetFormDialog } from "./budget-form-dialog";
+import { BudgetForm } from "./budget-form";
 import { DeleteBudgetDialog } from "./delete-budget-dialog";
 
 type DialogMode = "add" | "edit";
@@ -105,21 +106,24 @@ export function BudgetsView() {
         ))}
       </div>
 
-      {isFormDialogOpen && (
-        <BudgetFormDialog
+      {isFormDialogOpen ? (
+        <ResponsiveDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
           title={dialogMode === "add" ? "Add Budget" : "Edit Budget"}
-          defaultValues={
-            dialogMode === "edit" && selectedBudget
-              ? selectedBudget
-              : undefined
-          }
-          submitLabel={
-            dialogMode === "add" ? "Save Budget" : "Update Budget"
-          }
-        />
-      )}
+        >
+          <BudgetForm
+            defaultValues={
+              dialogMode === "edit" && selectedBudget
+                ? selectedBudget
+                : undefined
+            }
+            submitLabel={
+              dialogMode === "add" ? "Save Budget" : "Update Budget"
+            }
+          />
+        </ResponsiveDialog>
+      ) : null}
 
       <DeleteBudgetDialog
         open={isDeleteDialogOpen}

@@ -1,9 +1,11 @@
+
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useWatch } from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
+import { FormField } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 
@@ -109,16 +111,18 @@ export function TransactionForm({
       onSubmit={handleSubmit(onSubmit)}
       noValidate
     >
-      <div className="space-y-1.5">
-        <label
-          htmlFor="transaction-type"
-          className="text-sm font-medium"
-        >
-          Type
-        </label>
-
+      <FormField
+        id="transaction-type"
+        label="Type"
+        error={errors.type?.message}
+      >
         <Select
           id="transaction-type"
+          aria-describedby={
+            errors.type?.message
+              ? "transaction-type-error"
+              : undefined
+          }
           {...typeField}
           onChange={handleTypeChange}
         >
@@ -126,48 +130,40 @@ export function TransactionForm({
           <option value="income">Income</option>
           <option value="expense">Expense</option>
         </Select>
+      </FormField>
 
-        {errors.type?.message ? (
-          <p className="text-sm text-red-600" role="alert">
-            {errors.type.message}
-          </p>
-        ) : null}
-      </div>
-
-      <div className="space-y-1.5">
-        <label
-          htmlFor="transaction-amount"
-          className="text-sm font-medium"
-        >
-          Amount
-        </label>
-
+      <FormField
+        id="transaction-amount"
+        label="Amount"
+        error={errors.amount?.message}
+      >
         <Input
           id="transaction-amount"
           type="number"
           step="any"
+          aria-describedby={
+            errors.amount?.message
+              ? "transaction-amount-error"
+              : undefined
+          }
           {...register("amount", {
             valueAsNumber: true,
           })}
         />
+      </FormField>
 
-        {errors.amount?.message ? (
-          <p className="text-sm text-red-600" role="alert">
-            {errors.amount.message}
-          </p>
-        ) : null}
-      </div>
-
-      <div className="space-y-1.5">
-        <label
-          htmlFor="transaction-category"
-          className="text-sm font-medium"
-        >
-          Category
-        </label>
-
+      <FormField
+        id="transaction-category"
+        label="Category"
+        error={errors.categoryId?.message}
+      >
         <Select
           id="transaction-category"
+          aria-describedby={
+            errors.categoryId?.message
+              ? "transaction-category-error"
+              : undefined
+          }
           disabled={
             !selectedType ||
             isCategoriesInitialLoading ||
@@ -192,56 +188,42 @@ export function TransactionForm({
             </option>
           ))}
         </Select>
+      </FormField>
 
-        {errors.categoryId?.message ? (
-          <p className="text-sm text-red-600" role="alert">
-            {errors.categoryId.message}
-          </p>
-        ) : null}
-      </div>
-
-      <div className="space-y-1.5">
-        <label
-          htmlFor="transaction-date"
-          className="text-sm font-medium"
-        >
-          Date
-        </label>
-
+      <FormField
+        id="transaction-date"
+        label="Date"
+        error={errors.date?.message}
+      >
         <Input
           id="transaction-date"
           type="date"
+          aria-describedby={
+            errors.date?.message
+              ? "transaction-date-error"
+              : undefined
+          }
           {...register("date")}
         />
+      </FormField>
 
-        {errors.date?.message ? (
-          <p className="text-sm text-red-600" role="alert">
-            {errors.date.message}
-          </p>
-        ) : null}
-      </div>
-
-      <div className="space-y-1.5">
-        <label
-          htmlFor="transaction-description"
-          className="text-sm font-medium"
-        >
-          Description
-        </label>
-
+      <FormField
+        id="transaction-description"
+        label="Description"
+        error={errors.description?.message}
+      >
         <Input
           id="transaction-description"
           type="text"
           placeholder="Optional description"
+          aria-describedby={
+            errors.description?.message
+              ? "transaction-description-error"
+              : undefined
+          }
           {...register("description")}
         />
-
-        {errors.description?.message ? (
-          <p className="text-sm text-red-600" role="alert">
-            {errors.description.message}
-          </p>
-        ) : null}
-      </div>
+      </FormField>
 
       {submitError ? (
         <p className="text-sm text-danger" role="alert">

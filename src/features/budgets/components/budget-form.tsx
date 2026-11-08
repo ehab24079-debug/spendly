@@ -1,4 +1,6 @@
+
 import { Button } from "@/components/ui/button";
+import { FormField } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 
@@ -18,14 +20,12 @@ export function BudgetForm({
 }: BudgetFormProps) {
   return (
     <div className="space-y-4 sm:space-y-5">
-      <div>
-        <label
-          htmlFor="budget-category"
-          className="mb-1.5 block text-xs font-medium sm:mb-2 sm:text-sm"
-        >
-          Category
-        </label>
-
+      <FormField
+        id="budget-category"
+        label="Category"
+        labelClassName="text-xs font-medium sm:text-sm"
+        className="sm:space-y-2"
+      >
         <Select
           id="budget-category"
           defaultValue={defaultValues?.category ?? ""}
@@ -40,16 +40,14 @@ export function BudgetForm({
           <option value="entertainment">Entertainment</option>
           <option value="other-expense">Other Expense</option>
         </Select>
-      </div>
+      </FormField>
 
-      <div>
-        <label
-          htmlFor="budget-limit"
-          className="mb-1.5 block text-xs font-medium sm:mb-2 sm:text-sm"
-        >
-          Monthly limit
-        </label>
-
+      <FormField
+        id="budget-limit"
+        label="Monthly limit"
+        labelClassName="text-xs font-medium sm:text-sm"
+        className="sm:space-y-2"
+      >
         <Input
           id="budget-limit"
           type="number"
@@ -58,7 +56,7 @@ export function BudgetForm({
           placeholder="Enter budget amount"
           defaultValue={defaultValues?.limit}
         />
-      </div>
+      </FormField>
 
       <Button type="button" className="w-full">
         {submitLabel}

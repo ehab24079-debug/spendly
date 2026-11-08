@@ -1,7 +1,7 @@
+
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { ResponsiveDialog } from "@/components/ui/responsive-dialog";
+import { ConfirmationDialog } from "@/components/feedback/confirmation-dialog";
 
 type DeleteTransactionDialogProps = {
   open: boolean;
@@ -18,53 +18,17 @@ export function DeleteTransactionDialog({
   isPending,
   errorMessage,
 }: DeleteTransactionDialogProps) {
-  function handleOpenChange(nextOpen: boolean) {
-    if (isPending && !nextOpen) {
-      return;
-    }
-
-    onOpenChange(nextOpen);
-  }
-
   return (
-    <ResponsiveDialog
+    <ConfirmationDialog
       open={open}
-      onOpenChange={handleOpenChange}
+      onOpenChange={onOpenChange}
       title="Delete transaction?"
-    >
-      <div className="space-y-6">
-        <p className="text-sm text-foreground-secondary">
-          This action cannot be undone. This transaction will be
-          permanently deleted.
-        </p>
-
-        {errorMessage ? (
-          <p className="text-sm text-danger" role="alert">
-            {errorMessage}
-          </p>
-        ) : null}
-
-        <div className="flex justify-end gap-3">
-          <Button
-            type="button"
-            variant="secondary"
-            autoFocus
-            disabled={isPending}
-            onClick={() => handleOpenChange(false)}
-          >
-            Cancel
-          </Button>
-
-          <Button
-            type="button"
-            variant="danger"
-            disabled={isPending}
-            onClick={onConfirm}
-          >
-            {isPending ? "Deleting..." : "Delete transaction"}
-          </Button>
-        </div>
-      </div>
-    </ResponsiveDialog>
+      description="This action cannot be undone. This transaction will be permanently deleted."
+      confirmLabel="Delete transaction"
+      pendingLabel="Deleting..."
+      onConfirm={onConfirm}
+      isPending={isPending}
+      errorMessage={errorMessage}
+    />
   );
 }

@@ -1,14 +1,19 @@
-
 import { Button } from "@/components/ui/button";
 import { StateCard } from "@/components/ui/state-card";
 
-type BudgetsErrorStateProps = {
+type ErrorStateProps = {
+  title: string;
+  description: string;
   onRetry?: () => void;
+  isRetrying?: boolean;
 };
 
-export function BudgetsErrorState({
+export function ErrorState({
+  title,
+  description,
   onRetry,
-}: BudgetsErrorStateProps) {
+  isRetrying = false,
+}: ErrorStateProps) {
   return (
     <StateCard
       action={
@@ -16,19 +21,20 @@ export function BudgetsErrorState({
           <Button
             type="button"
             variant="secondary"
+            disabled={isRetrying}
             onClick={onRetry}
           >
-            Try again
+            {isRetrying ? "Retrying..." : "Try again"}
           </Button>
         ) : undefined
       }
     >
       <h2 className="text-lg font-semibold">
-        Unable to load budgets
+        {title}
       </h2>
 
       <p className="mt-2 text-sm text-foreground-secondary">
-        Something went wrong while loading your budgets. Please try again.
+        {description}
       </p>
     </StateCard>
   );
