@@ -40,7 +40,7 @@ export function BudgetCard({
         </span>
       </div>
 
-      <Progress value={progress} tone={tone} />
+      <Progress value={Math.min(progress, 100)} tone={tone} />
 
       <div className="mt-4 flex justify-end gap-2 sm:mt-5">
         <Button

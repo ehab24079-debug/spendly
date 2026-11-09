@@ -18,15 +18,18 @@
     "type": {
       "type": "enumeration",
       "required": true,
-      "enum": [
-        "income",
-        "expense"
-      ]
+      "enum": ["income", "expense"]
     },
     "transactions": {
       "type": "relation",
       "relation": "oneToMany",
       "target": "api::transaction.transaction",
+      "mappedBy": "category"
+    },
+    "budget": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::budget.budget",
       "mappedBy": "category"
     }
   }

@@ -1,4 +1,3 @@
-
 "use client";
 
 import { ConfirmationDialog } from "@/components/feedback/confirmation-dialog";
@@ -7,7 +6,9 @@ type DeleteBudgetDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   category?: string;
-  onConfirm: () => void;
+  onConfirm: () => void | Promise<void>;
+  isPending?: boolean;
+  errorMessage?: string;
 };
 
 export function DeleteBudgetDialog({
@@ -15,6 +16,8 @@ export function DeleteBudgetDialog({
   onOpenChange,
   category,
   onConfirm,
+  isPending = false,
+  errorMessage,
 }: DeleteBudgetDialogProps) {
   return (
     <ConfirmationDialog
@@ -27,7 +30,10 @@ export function DeleteBudgetDialog({
           : "Are you sure you want to delete this budget? This action cannot be undone."
       }
       confirmLabel="Delete budget"
+      pendingLabel="Deleting..."
       onConfirm={onConfirm}
+      isPending={isPending}
+      errorMessage={errorMessage}
     />
   );
 }
