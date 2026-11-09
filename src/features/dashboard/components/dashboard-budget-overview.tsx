@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { formatCurrency } from "@/lib/formatters";
@@ -31,23 +30,33 @@ export function DashboardBudgetOverview({
         </p>
       </div>
 
-      <div className="space-y-4 sm:space-y-5">
-        {budgets.map((budget) => (
-          <div key={budget.id}>
-            <div className="mb-2 flex items-center justify-between gap-3">
-              <span className="min-w-0 truncate text-sm font-medium sm:text-base">
-                {budget.category}
-              </span>
+      {budgets.length === 0 ? (
+        <p className="py-6 text-center text-sm text-foreground-secondary">
+          No budgets created yet.
+        </p>
+      ) : (
+        <div className="space-y-4 sm:space-y-5">
+          {budgets.map((budget) => (
+            <div key={budget.id}>
+              <div className="mb-2 flex items-center justify-between gap-3">
+                <span className="min-w-0 truncate text-sm font-medium sm:text-base">
+                  {budget.category}
+                </span>
 
-              <span className="shrink-0 whitespace-nowrap text-xs text-foreground-secondary sm:text-sm">
-                {formatCurrency(budget.spent)} / {formatCurrency(budget.limit)}
-              </span>
+                <span className="shrink-0 whitespace-nowrap text-xs text-foreground-secondary sm:text-sm">
+                  {formatCurrency(budget.spent)} /{" "}
+                  {formatCurrency(budget.limit)}
+                </span>
+              </div>
+
+              <Progress
+                value={Math.min(budget.progress, 100)}
+                tone={budget.tone}
+              />
             </div>
-
-            <Progress value={budget.progress} tone={budget.tone} />
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </Card>
   );
 }

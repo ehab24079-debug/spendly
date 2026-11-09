@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { formatCurrency, formatDate } from "@/lib/formatters";
 
@@ -30,34 +29,41 @@ export function DashboardRecentTransactions({
         </p>
       </div>
 
-      <div className="divide-y divide-border">
-        {transactions.map((transaction) => (
-          <div
-            key={transaction.id}
-            className="flex items-center justify-between gap-3 py-3 first:pt-0 last:pb-0 sm:gap-4 sm:py-4"
-          >
-            <div className="min-w-0">
-              <p className="truncate text-sm font-medium sm:text-base">
-                {transaction.description}
-              </p>
+      {transactions.length === 0 ? (
+        <p className="py-6 text-center text-sm text-foreground-secondary">
+          No transactions for this month yet.
+        </p>
+      ) : (
+        <div className="divide-y divide-border">
+          {transactions.map((transaction) => (
+            <div
+              key={transaction.id}
+              className="flex items-center justify-between gap-3 py-3 first:pt-0 last:pb-0 sm:gap-4 sm:py-4"
+            >
+              <div className="min-w-0">
+                <p className="truncate text-sm font-medium sm:text-base">
+                  {transaction.description}
+                </p>
 
-              <p className="mt-1 text-xs text-foreground-secondary sm:text-sm">
-                {transaction.category} · {formatDate(transaction.date)}
+                <p className="mt-1 text-xs text-foreground-secondary sm:text-sm">
+                  {transaction.category} ·{" "}
+                  {formatDate(transaction.date)}
+                </p>
+              </div>
+
+              <p
+                className={`shrink-0 whitespace-nowrap text-sm font-semibold sm:text-base ${
+                  transaction.type === "income"
+                    ? "text-positive"
+                    : "text-danger"
+                }`}
+              >
+                {formatCurrency(transaction.amount)}
               </p>
             </div>
-
-            <p
-              className={`shrink-0 whitespace-nowrap text-sm font-semibold sm:text-base ${
-                transaction.type === "income"
-                  ? "text-positive"
-                  : "text-danger"
-              }`}
-            >
-              {formatCurrency(transaction.amount)}
-            </p>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </Card>
   );
 }
